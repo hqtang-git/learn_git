@@ -87,7 +87,8 @@ nothing to commit, working tree clean
 
 ![git-stage-after-commit](https://www.liaoxuefeng.com/files/attachments/919020100829536/0)
 
-#### 小结
+**小结**
+
 暂存区是Git非常重要的概念，弄明白了暂存区，就弄明白了Git的很多操作到底干了什么。没弄明白暂存区是怎么回事的童鞋，请向上滚动页面，再看一次。
 
 ### 管理修改
@@ -98,22 +99,23 @@ nothing to commit, working tree clean
 ## 远程仓库
 Git是分布式版本控制系统，同一个Git仓库，可以分布到不同的机器上。怎么分布呢？最早，肯定只有一台机器有一个原始版本库，此后，别的机器可以“克隆”这个原始版本库，而且每台机器的版本库其实都是一样的，并没有主次之分。
 
-由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以，需要一点设置：
+由于你的本地Git仓库和`GitHub`仓库之间的传输是通过SSH加密的，所以，需要一点设置：
 第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有`id_rsa`和`id_rsa.pub`这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：
+
 ```shell
 $ ssh-keygen -t rsa -C "1977986921@qq.com"
 ```
 你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码。
 如果一切顺利的话，可以在用户主目录里找到`.ssh`目录，里面有`id_rsa`和`id_rsa.pub`两个文件，这两个就是SSH Key的秘钥对，`id_rsa`是私钥，不能泄露出去，`id_rsa.pub`是公钥，可以放心地告诉任何人。
-第2步：登陆GitHub，打开“Account settings”，“SSH Keys”页面：然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴`id_rsa.pub`文件的内容。
+第2步：登陆`GitHub`，打开“Account settings”，“SSH Keys”页面：然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴`id_rsa.pub`文件的内容。
 
 ### 添加远程库
-1.登陆GitHub，然后，在右上角找到“Create a new repo”按钮，创建一个新的仓库。
-2.然后，在Repository name填入learngit，其他保持默认设置，点击“Create repository”按钮，就成功地创建了一个新的Git仓库.
+1.登陆`GitHub`，然后，在右上角找到“Create a new repo”按钮，创建一个新的仓库。
+2.然后，在Repository name填入`learngit`，其他保持默认设置，点击“Create repository”按钮，就成功地创建了一个新的Git仓库.
 
-目前，在GitHub上的这个`learngit`仓库还是空的，GitHub告诉我们，可以从这个仓库克隆出新的仓库，也可以把一个已有的本地仓库与之关联，然后，把本地仓库的内容推送到GitHub仓库。
+目前，在`GitHub`上的这个`learngit`仓库还是空的，`GitHub`告诉我们，可以从这个仓库克隆出新的仓库，也可以把一个已有的本地仓库与之关联，然后，把本地仓库的内容推送到`GitHub`仓库。
 
-现在，我们根据GitHub的提示，在本地的`learn_git`仓库下运行命令：
+现在，我们根据`GitHub`的提示，在本地的`learn_git`仓库下运行命令：
 
 ```shell
 $ git remote add origin git@github.com:hqtang-git/learn_git.git
@@ -143,136 +145,19 @@ $ git push -u origin master
 
 ## 分支管理
 
-分支就是科幻电影里面的平行宇宙，当你正在电脑前努力学习Git的时候，另一个你正在另一个平行宇宙里努力学习SVN。
-如果两个平行宇宙互不干扰，那对现在的你也没啥影响。不过，在某个时间点，两个平行宇宙合并了，结果，你既学会了Git又学会了SVN！
+分支就是科幻电影里面的平行宇宙，当你正在电脑前努力学习Git的时候，另一个你正在另一个平行宇宙里努力学习`SVN`。
+如果两个平行宇宙互不干扰，那对现在的你也没啥影响。不过，在某个时间点，两个平行宇宙合并了，结果，你既学会了Git又学会了`SVN`！
 
 ![learn-branches](https://www.liaoxuefeng.com/files/attachments/919021987875136/0)
 
 分支在实际中有什么用呢？假设你准备开发一个新功能，但是需要两周才能完成，第一周你写了50%的代码，如果立刻提交，由于代码还没写完，不完整的代码库会导致别人不能干活了。如果等代码全部写完再一次提交，又存在丢失每天进度的巨大风险。
 现在有了分支，就不用怕了。你创建了一个属于你自己的分支，别人看不到，还继续在原来的分支上正常工作，而你在自己的分支上干活，想提交就提交，直到开发完毕后，再一次性合并到原来的分支上，这样，既安全，又不影响别人工作。
-其他版本控制系统如SVN等都有分支管理，但是用过之后你会发现，这些版本控制系统创建和切换分支比蜗牛还慢，简直让人无法忍受，结果分支功能成了摆设，大家都不去用。
+其他版本控制系统如`SVN`等都有分支管理，但是用过之后你会发现，这些版本控制系统创建和切换分支比蜗牛还慢，简直让人无法忍受，结果分支功能成了摆设，大家都不去用。
 但Git的分支是与众不同的，无论创建、切换和删除分支，Git在1秒钟之内就能完成！无论你的版本库是1个文件还是1万个文件。
 
 ### 创建与合并分支
 
 在版本回退里，你已经知道，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即`master`分支。`HEAD`严格来说不是指向提交，而是指向`master`，`master`才是指向提交的，所以，`HEAD`指向的就是当前分支。
-
-一开始的时候，`master`分支是一条线，Git用`master`指向最新的提交，再用`HEAD`指向`master`，就能确定当前分支，以及当前分支的提交点：
-
-![git-br-initial](https://www.liaoxuefeng.com/files/attachments/919022325462368/0)
-
-每次提交，`master`分支都会向前移动一步，这样，随着你不断提交，`master`分支的线也越来越长。
-
-当我们创建新的分支，例如`dev`时，Git新建了一个指针叫`dev`，指向`master`相同的提交，再把`HEAD`指向`dev`，就表示当前分支在`dev`上：
-
-![git-br-create](https://www.liaoxuefeng.com/files/attachments/919022363210080/0)
-
-你看，Git创建一个分支很快，因为除了增加一个`dev`指针，改改`HEAD`的指向，工作区的文件都没有任何变化！
-
-不过，从现在开始，对工作区的修改和提交就是针对`dev`分支了，比如新提交一次后，`dev`指针往前移动一步，而`master`指针不变：
-
-![git-br-dev-fd](https://www.liaoxuefeng.com/files/attachments/919022387118368/0)
-
-假如我们在`dev`上的工作完成了，就可以把`dev`合并到`master`上。Git怎么合并呢？最简单的方法，就是直接把`master`指向`dev`的当前提交，就完成了合并：
-
-![git-br-ff-merge](https://www.liaoxuefeng.com/files/attachments/919022412005504/0)
-
-所以Git合并分支也很快！就改改指针，工作区内容也不变！
-
-合并完分支后，甚至可以删除`dev`分支。删除`dev`分支就是把`dev`指针给删掉，删掉后，我们就剩下了一条`master`分支：
-
-![git-br-rm](https://www.liaoxuefeng.com/files/attachments/919022479428512/0)
-
-真是太神奇了，你看得出来有些提交是通过分支完成的吗？
-
-下面开始实战。
-
-首先，我们创建`dev`分支，然后切换到`dev`分支：
-
-```
-$ git checkout -b dev
-Switched to a new branch 'dev'
-```
-
-`git checkout`命令加上`-b`参数表示创建并切换，相当于以下两条命令：
-
-```
-$ git branch dev
-$ git checkout dev
-Switched to branch 'dev'
-```
-
-然后，用`git branch`命令查看当前分支：
-
-```shell
-$ git branch
-* dev
-  master
-```
-
-`git branch`命令会列出所有分支，当前分支前面会标一个`*`号。
-
-然后，我们就可以在`dev`分支上正常提交，比如对`readme.txt`做个修改，加上一行：
-
-```shell
-Creating a new branch is quick.
-```
-
-然后提交：
-
-```shell
-$ git add readme.txt 
-$ git commit -m "branch test"
-[dev b17d20e] branch test
- 1 file changed, 1 insertion(+)
-```
-
-现在，`dev`分支的工作完成，我们就可以切换回`master`分支：
-
-```shell
-$ git checkout master
-Switched to branch 'master'
-```
-
-切换回`master`分支后，再查看一个`readme.txt`文件，刚才添加的内容不见了！因为那个提交是在`dev`分支上，而`master`分支此刻的提交点并没有变：
-
-![git-br-on-master](https://www.liaoxuefeng.com/files/attachments/919022533080576/0)
-
-现在，我们把`dev`分支的工作成果合并到`master`分支上：
-
-```shell
-$ git merge dev
-Updating d46f35e..b17d20e
-Fast-forward
- readme.txt | 1 +
- 1 file changed, 1 insertion(+)
-```
-
-`git merge`命令用于合并指定分支到当前分支。合并后，再查看`readme.txt`的内容，就可以看到，和`dev`分支的最新提交是完全一样的。
-
-注意到上面的`Fast-forward`信息，Git告诉我们，这次合并是“快进模式”，也就是直接把`master`指向`dev`的当前提交，所以合并速度非常快。
-
-当然，也不是每次合并都能`Fast-forward`，我们后面会讲其他方式的合并。
-
-合并完成后，就可以放心地删除`dev`分支了：
-
-```shell
-$ git branch -d dev
-Deleted branch dev (was b17d20e).
-```
-
-删除后，查看`branch`，就只剩下`master`分支了：
-
-```shell
-$ git branch
-* master
-```
-
-因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在`master`分支上工作效果是一样的，但过程更安全。
-
-### 创建与合并分支
-
-在版本回退里，你已经知道，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即`master`分支。`HEAD`严格来说不是指向提交，而是指向`master`，`master`才是指向提交的，所以，`HEAD`指向的就是当前分支。
 一开始的时候，`master`分支是一条线，Git用`master`指向最新的提交，再用`HEAD`指向`master`，就能确定当前分支，以及当前分支的提交点：
 
 ![git-br-initial](https://www.liaoxuefeng.com/files/attachments/919022325462368/0)
@@ -359,7 +244,8 @@ $ git branch
 ```
 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在`master`分支上工作效果是一样的，但过程更安全。
 
-#### 小结
+**小结**
+
 Git鼓励大量使用分支：
 查看分支：`git branch`
 创建分支：`git branch <name>`
@@ -486,12 +372,14 @@ $ git branch -d feature1
 Deleted branch feature1 (was 14096d0).
 ```
 工作完成。
-#### 小结
+
+**小结**
+
 当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再提交，合并完成。
 解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。
 用`git log --graph`命令可以看到分支合并图。
 
-## 分支管理策略
+### 分支管理策略
 
 通常，合并分支时，如果可能，Git会用`Fast forward`模式，但这种模式下，删除分支后，会丢掉分支信息。
 如果要强制禁用`Fast forward`模式，Git就会在`merge`时生成一个新的`commit`，这样，从分支历史上就可以看出分支信息。
@@ -535,7 +423,8 @@ $ git log --graph --pretty=oneline --abbrev-commit
 
 ![git-no-ff-mode](https://www.liaoxuefeng.com/files/attachments/919023225142304/0)
 
-#### 分支策略
+**分支策略**
+
 在实际开发中，我们应该按照几个基本原则进行分支管理：
 首先，`master`分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
 那在哪干活呢？干活都在`dev`分支上，也就是说，`dev`分支是不稳定的，到某个时候，比如1.0版本发布时，再把`dev`分支合并到`master`上，在`master`分支发布1.0版本；
@@ -544,13 +433,15 @@ $ git log --graph --pretty=oneline --abbrev-commit
 
 ![git-br-policy](https://www.liaoxuefeng.com/files/attachments/919023260793600/0)
 
-#### 小结
+**小结**
+
 Git分支十分强大，在团队开发中应该充分应用。
 合并分支时，加上`--no-ff`参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而`fast forward`合并就看不出来曾经做过合并。
 
 ### Bug分支
 软件开发中，bug就像家常便饭一样。有了bug就需要修复，在Git中，由于分支是如此的强大，所以，每个bug都可以通过一个新的临时分支来修复，修复后，合并分支，然后将临时分支删除。
 当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支`issue-101`来修复它，但是，等等，当前正在`dev`上进行的工作还没有提交：
+
 ```shell
 $ git status
 On branch dev
@@ -567,12 +458,14 @@ Changes not staged for commit:
 ```
 并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
 幸好，Git还提供了一个`stash`功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+
 ```shell
 $ git stash
 Saved working directory and index state WIP on dev: f52c633 add merge
 ```
 现在，用`git status`查看工作区，就是干净的（除非有没有被Git管理的文件），因此可以放心地创建分支来修复bug。
 首先确定要在哪个分支上修复bug，假定需要在`master`分支上修复，就从`master`创建临时分支：
+
 ```shell
 $ git checkout master
 Switched to branch 'master'
@@ -660,8 +553,62 @@ $ git cherry-pick 4c805e2
 Git自动给`dev`分支做了一次提交，注意这次提交的commit是`1d4b803`，它并不同于master的`4c805e2`，因为这两个commit只是改动相同，但确实是两个不同的commit。用`git cherry-pick`，我们就不需`dev`ev分支上手动再把修bug的过程重复一遍。
 有些聪明的童鞋会想了，既然可以在master分支上修复bu`dev`在`dev`分支上可以“重放”这个修复过程`dev`直接在`dev`分支上修复bug，然后在master分支上“重放”行不行？当然可以，不过你仍然需要`git stash`命令`dev`场，才能从`dev`分支切换到master分支。
 
-#### 小结
+**小结**
+
 修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
 当手头工作没有完成时，先把工作现场`git stash`一下，然后去修复bug，修复后，再`git stash pop`，回到工作现场；
-在master分支上修复的b`dev`想要合并到当前`dev`分支，可以用`git cherry-pick <commit>`命令，把bug提交的修改“复制”到当前分支，避免重复劳动。
+在master分支上修复的`dev`想要合并到当前`dev`分支，可以用`git cherry-pick <commit>`命令，把bug提交的修改“复制”到当前分支，避免重复劳动。
+
+### Feature分支
+
+软件开发中，总有无穷无尽的新的功能要不断添加进来。
+添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+
+现在，你终于接到了一个新任务：开发代号为Vulcan的新功能，该功能计划用于下一代星际飞船。
+于是准备开发：
+
+```shell
+$ git checkout -b feature-vulcan
+Switched to a new branch 'feature-vulcan'
+```
+5分钟后，开发完毕：
+```shell
+$ git add vulcan.py
+
+$ git status
+On branch feature-vulcan
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   vulcan.py
+
+$ git commit -m "add feature vulcan"
+[feature-vulcan 287773e] add feature vulcan
+ 1 file changed, 2 insertions(+)
+ create mode 100644 vulcan.py
+```
+切回`dev`，准备合并：
+```shell
+$ git checkout dev
+```
+一切顺利的话，feature分支和bug分支是类似的，合并，然后删除。
+但是！
+就在此时，接到上级命令，因经费不足，新功能必须取消！
+虽然白干了，但是这个包含机密资料的分支还是必须就地销毁：
+```shell
+$ git branch -d feature-vulcan
+error: The branch 'feature-vulcan' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature-vulcan'.
+```
+销毁失败。Git友情提醒，`feature-vulcan`分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的`-D`参数。。
+现在我们强行删除：
+```shell
+$ git branch -D feature-vulcan
+Deleted branch feature-vulcan (was 287773e).
+```
+终于删除成功！
+
+**小结**
+开发一个新feature，最好新建一个分支；
+如果要丢弃一个没有被合并过的分支，可以通过`git branch -D <name>`强行删除。
 
