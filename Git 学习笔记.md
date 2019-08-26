@@ -270,7 +270,8 @@ $ git branch
 
 因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在`master`分支上工作效果是一样的，但过程更安全。
 
-####  创建与合并分支
+### 创建与合并分支
+
 在版本回退里，你已经知道，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即`master`分支。`HEAD`严格来说不是指向提交，而是指向`master`，`master`才是指向提交的，所以，`HEAD`指向的就是当前分支。
 一开始的时候，`master`分支是一条线，Git用`master`指向最新的提交，再用`HEAD`指向`master`，就能确定当前分支，以及当前分支的提交点：
 
@@ -370,6 +371,7 @@ Git鼓励大量使用分支：
 ###  解决冲突
 人生不如意之事十之八九，合并分支往往也不是一帆风顺的。
 准备新的`feature1`分支，继续我们的新分支开发：
+
 ```shell
 $ git checkout -b feature1
 Switched to a new branch 'feature1'
@@ -395,6 +397,7 @@ Your branch is ahead of 'origin/master' by 1 commit.
 ```
 Git还会自动提示我们当前`master`分支比远程的`master`分支要超前1个提交。
 在`master`分支上把`readme.txt`文件的最后一行改为：
+
 ```
 Creating a new branch is quick & simple.
 ```
@@ -487,3 +490,59 @@ Deleted branch feature1 (was 14096d0).
 当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再提交，合并完成。
 解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。
 用`git log --graph`命令可以看到分支合并图。
+
+## 分支管理策略
+
+通常，合并分支时，如果可能，Git会用`Fast forward`模式，但这种模式下，删除分支后，会丢掉分支信息。
+如果要强制禁用`Fast forward`模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+下面我们实战一下`--no-ff`方式的`git merge`：
+首先，仍然创建并切换`dev`分支：
+```shell
+$ git checkout -b dev
+Switched to a new branch 'dev'
+```
+修改readme.txt文件，并提交一个新的commit：
+```shell
+$ git add readme.txt 
+$ git commit -m "add merge"
+[dev f52c633] add merge
+ 1 file changed, 1 insertion(+)
+```
+现在，我们切换回`master`：
+```shell
+$ git checkout master
+Switched to branch 'master'
+```
+准备合并`dev`分支，请注意`--no-ff`参数，表示禁用`Fast forward`：
+```shell
+$ git merge --no-ff -m "merge with no-ff" dev
+Merge made by the 'recursive' strategy.
+ readme.txt | 1 +
+ 1 file changed, 1 insertion(+)
+```
+因为本次合并要创建一个新的commit，所以加上`-m`参数，把commit描述写进去。合并后，我们用`git log`看看分支历史：
+```shell
+$ git log --graph --pretty=oneline --abbrev-commit
+*   e1e9c68 (HEAD -> master) merge with no-ff
+|\  
+| * f52c633 (dev) add merge
+|/  
+*   cf810e4 conflict fixed
+...
+```
+可以看到，不使用`Fast forward`模式，merge后就像这样：
+
+![git-no-ff-mode](https://www.liaoxuefeng.com/files/attachments/919023225142304/0)
+
+#### 分支策略
+在实际开发中，我们应该按照几个基本原则进行分支管理：
+首先，`master`分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+那在哪干活呢？干活都在`dev`分支上，也就是说，`dev`分支是不稳定的，到某个时候，比如1.0版本发布时，再把`dev`分支合并到`master`上，在`master`分支发布1.0版本；
+你和你的小伙伴们每个人都在`dev`分支上干活，每个人都有自己的分支，时不时地往`dev`分支上合并就可以了。
+所以，团队合作的分支看起来就像这样：
+
+![git-br-policy](https://www.liaoxuefeng.com/files/attachments/919023260793600/0)
+
+#### 小结
+Git分支十分强大，在团队开发中应该充分应用。
+合并分支时，加上`--no-ff`参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而`fast forward`合并就看不出来曾经做过合并。
