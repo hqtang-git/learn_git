@@ -750,8 +750,8 @@ To github.com:michaelliao/learngit.git
 3. 如果合并有冲突，则解决冲突，并在本地提交；
 
 4. 没有冲突或者解决掉冲突后，再用`git push origin <branch-name>`推送就能成功！
-  如果`git pull`提示`no tracking information`，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to <branch-name> origin/<branch-name>`。
-  这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+    如果`git pull`提示`no tracking information`，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to <branch-name> origin/<branch-name>`。
+    这就是多人协作的工作模式，一旦熟悉了，就非常简单。
 
   **小结**
 
@@ -761,3 +761,281 @@ To github.com:michaelliao/learngit.git
 - 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`，本地和远程分支的名称最好一致；
 - 建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
 - 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
+
+## 标签管理
+
+发布一个版本时，我们通常先在版本库中打一个标签（tag），这样，就唯一确定了打标签时刻的版本。将来无论什么时候，取某个标签的版本，就是把那个打标签的时刻的历史版本取出来。所以，标签也是版本库的一个快照。
+Git的标签虽然是版本库的快照，但其实它就是指向某个commit的指针（跟分支很像对不对？但是分支可以移动，标签不能移动），所以，创建和删除标签都是瞬间完成的。
+Git有commit，为什么还要引入tag？
+“请把上周一的那个版本打包发布，commit号是`6a5819e`...”
+“一串乱七八糟的数字不好找！”
+如果换一个办法：
+“请把上周一的那个版本打包发布，版本号是v1.2”
+“好的，按照`tag v1.2`查找commit就行！”
+所以，tag就是一个让人容易记住的有意义的名字，它跟某个commit绑在一起
+
+### 创建标签
+在Git中打标签非常简单，首先，切换到需要打标签的分支上：
+```shell
+$ git branch
+* dev
+  master
+$ git checkout master
+Switched to branch 'master'
+```
+然后，敲命令`git tag <name>`就可以打一个新标签：
+```shell
+$ git tag v1.0
+```
+可以用命令`git tag`查看所有标签：
+```shell
+$ git tag
+v1.0
+```
+默认标签是打在最新提交的commit上的。有时候，如果忘了打标签，比如，现在已经是周五了，但应该在周一打的标签没有打，怎么办？
+方法是找到历史提交的commit id，然后打上就可以了：
+```shell
+$ git log --pretty=oneline --abbrev-commit
+12a631b (HEAD -> master, tag: v1.0, origin/master) merged bug fix 101
+4c805e2 fix bug 101
+e1e9c68 merge with no-ff
+f52c633 add merge
+cf810e4 conflict fixed
+5dc6824 & simple
+14096d0 AND simple
+b17d20e branch test
+d46f35e remove test.txt
+b84166e add test.txt
+519219b git tracks changes
+e43a48b understand how stage works
+1094adb append GPL
+e475afc add distributed
+eaadf4e wrote a readme file
+```
+比方说要对`add merge`这次提交打标签，它对应的commit id是`f52c633`，敲入命令：
+```shell
+$ git tag v0.9 f52c633
+```
+再用命令`git tag`查看标签：
+```shell
+$ git tag
+v0.9
+v1.0
+```
+注意，标签不是按时间顺序列出，而是按字母排序的。可以用`git show <tagname>`查看标签信息：
+```shell
+$ git show v0.9
+commit f52c63349bc3c1593499807e5c8e972b82c8f286 (tag: v0.9)
+Author: Michael Liao <askxuefeng@gmail.com>
+Date:   Fri May 18 21:56:54 2018 +0800
+
+    add merge
+
+diff --git a/readme.txt b/readme.txt
+...
+```
+可以看到，`v0.9`确实打在`add merge`这次提交上。
+还可以创建带有说明的标签，用`-a`指定标签名，`-m`指定说明文字：
+```shell
+$ git tag -a v0.1 -m "version 0.1 released" 1094adb
+```
+用命令`git show <tagname>`可以看到说明文字：
+```shell
+$ git show v0.1
+tag v0.1
+Tagger: Michael Liao <askxuefeng@gmail.com>
+Date:   Fri May 18 22:48:43 2018 +0800
+
+version 0.1 released
+
+commit 1094adb7b9b3807259d8cb349e7df1d4d6477073 (tag: v0.1)
+Author: Michael Liao <askxuefeng@gmail.com>
+Date:   Fri May 18 21:06:15 2018 +0800
+
+    append GPL
+
+diff --git a/readme.txt b/readme.txt
+...
+```
+ 注意：标签总是和某个commit挂钩。如果这个commit既出现在master分支，又出现在dev分支，那么在这两个分支上都可以看到这个标签。
+**小结**
+- 命令`git tag <tagname>`用于新建一个标签，默认为`HEAD`，也可以指定一个commit id；
+- 命令`git tag -a <tagname> -m "blablabla..."`可以指定标签信息；
+- 命令`git tag`可以查看所有标签。
+
+### 删除标签
+如果标签打错了，也可以删除：
+```shell
+$ git tag -d v0.1
+Deleted tag 'v0.1' (was f15b0dd)
+```
+因为创建的标签都只存储在本地，不会自动推送到远程。所以，打错的标签可以在本地安全删除。
+如果要推送某个标签到远程，使用命令`git push origin <tagname>`：
+
+```shell
+$ git push origin v1.0
+Total 0 (delta 0), reused 0 (delta 0)
+To github.com:michaelliao/learngit.git
+ * [new tag]         v1.0 -> v1.0
+```
+或者，一次性推送全部尚未推送到远程的本地标签：
+```shell
+$ git push origin --tags
+Total 0 (delta 0), reused 0 (delta 0)
+To github.com:michaelliao/learngit.git
+ * [new tag]         v0.9 -> v0.9
+```
+如果标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除：
+```shell
+$ git tag -d v0.9
+Deleted tag 'v0.9' (was f52c633)
+```
+然后，从远程删除。删除命令也是push，但是格式如下：
+```shell
+$ git push origin :refs/tags/v0.9
+To github.com:michaelliao/learngit.git
+ - [deleted]         v0.9
+```
+要看看是否真的从远程库删除了标签，可以登陆`GitHub`查看。
+**小结**
+
+- 命令`git push origin <tagname>`可以推送一个本地标签；
+- 命令`git push origin --tags`可以推送全部未推送过的本地标签；
+- 命令`git tag -d <tagname>`可以删除一个本地标签；
+- 命令`git push origin :refs/tags/<tagname>`可以删除一个远程标签。
+
+## 使用Github
+
+我们一直用GitHub作为免费的远程仓库，如果是个人的开源项目，放到GitHub上是完全没有问题的。其实GitHub还是一个开源协作社区，通过GitHub，既可以让别人参与你的开源项目，也可以参与别人的开源项目。
+在GitHub出现以前，开源项目开源容易，但让广大人民群众参与进来比较困难，因为要参与，就要提交代码，而给每个想提交代码的群众都开一个账号那是不现实的，因此，群众也仅限于报个bug，即使能改掉bug，也只能把diff文件用邮件发过去，很不方便。
+但是在GitHub上，利用Git极其强大的克隆和分支功能，广大人民群众真正可以第一次自由参与各种开源项目了。
+如何参与一个开源项目呢？比如人气极高的bootstrap项目，这是一个非常强大的`CSS`框架，你可以访问它的项目主页https://github.com/twbs/bootstrap，点“Fork”就在自己的账号下克隆了一个bootstrap仓库，然后，从自己的账号下clone：
+
+```shell
+git clone git@github.com:michaelliao/bootstrap.git
+```
+一定要从自己的账号下clone仓库，这样你才能推送修改。如果从bootstrap的作者的仓库地址`git@github.com:twbs/bootstrap.git`克隆，因为没有权限，你将不能推送修改。
+Bootstrap的官方仓库`twbs/bootstrap`、你在GitHub上克隆的仓库`my/bootstrap`，以及你自己克隆到本地电脑的仓库，他们的关系就像下图显示的那样：
+
+```ascii
+┌─ GitHub ────────────────────────────────────┐
+│                                             │
+│ ┌─────────────────┐     ┌─────────────────┐ │
+│ │ twbs/bootstrap  │────>│  my/bootstrap   │ │
+│ └─────────────────┘     └─────────────────┘ │
+│                                  ▲          │
+└──────────────────────────────────┼──────────┘
+                                   ▼
+                          ┌─────────────────┐
+                          │ local/bootstrap │
+                          └─────────────────┘
+```
+如果你想修复bootstrap的一个bug，或者新增一个功能，立刻就可以开始干活，干完后，往自己的仓库推送。
+如果你希望bootstrap的官方库能接受你的修改，你就可以在`GitHub`上发起一个pull request。当然，对方是否接受你的pull request就不一定了。
+如果你没能力修改bootstrap，但又想要试一把pull request，那就Fork一下我的仓库：https://github.com/michaelliao/learngit，创建一个`your-github-id.txt`的文本文件，写点自己学习Git的心得，然后推送一个pull request给我，我会视心情而定是否接受。
+
+**小结**
+
+- 在`GitHub`上，可以任意Fork开源仓库；
+- 自己拥有Fork后的仓库的读写权限；
+- 可以推送pull request给官方仓库来贡献代码。
+
+## 使用Gitee
+
+使用`GitHub`时，国内的用户经常遇到的问题是访问速度太慢，有时候还会出现无法连接的情况（原因你懂的）。
+如果我们希望体验Git飞一般的速度，可以使用国内的Git托管服务——[码云](https://gitee.com/)（[gitee.com](https://gitee.com/)）。
+和GitHub相比，码云也提供免费的Git仓库。此外，还集成了代码质量检测、项目演示等功能。对于团队协作开发，码云还提供了项目管理、代码托管、文档管理的服务，5人以下小团队免费。
+码云的免费版本也提供私有库功能，只是有5人的成员上限。
+使用码云和使用GitHub类似，我们在码云上注册账号并登录后，需要先上传自己的SSH公钥。选择右上角用户头像 -> 菜单“修改资料”，然后选择“SSH公钥”，填写一个便于识别的标题，然后把用户主目录下的`.ssh/id_rsa.pub`文件的内容粘贴进去：
+
+![gitee-add-ssh-key](https://www.liaoxuefeng.com/files/attachments/1163452910422880/l)
+
+点击“确定”即可完成并看到刚才添加的Key：
+
+![gitee-key](https://www.liaoxuefeng.com/files/attachments/1163453163108928/l)
+
+如果我们已经有了一个本地的git仓库（例如，一个名为learngit的本地库），如何把它关联到码云的远程库上呢？
+首先，我们在码云上创建一个新的项目，选择右上角用户头像 -> 菜单“控制面板”，然后点击“创建项目”：
+
+![gitee-new-repo](https://www.liaoxuefeng.com/files/attachments/1163453517527296/l)
+
+项目名称最好与本地库保持一致：
+然后，我们在本地库上使用命令`git remote add`把它和码云的远程库关联：
+```shell
+git remote add origin git@gitee.com:hqtang/learn-git.git
+```
+之后，就可以正常地用`git push`和`git pull`推送了！
+如果在使用命令`git remote add`时报错：
+
+```shell
+git remote add origin git@gitee.com:hqtang/learn-git.git
+fatal: remote origin already exists.
+```
+这说明本地库已经关联了一个名叫`origin`的远程库，此时，可以先用`git remote -v`查看远程库信息：
+```shell
+git remote -v
+origin	git@github.com:hqtang-git/learn_git.git (fetch)
+origin	git@github.com:hqtang-git/learn_git.git (push)
+```
+可以看到，本地库已经关联了`origin`的远程库，并且，该远程库指向GitHub。
+我们可以删除已有的GitHub远程库：
+```shell
+git remote rm origin
+```
+再关联码云的远程库（注意路径中需要填写正确的用户名）：
+```shell
+git remote add origin git@gitee.com:hqtang/learn-git.git
+```
+此时，我们再查看远程库信息：
+```shell
+git remote -v
+origin	git@gitee.com:hqtang/learng-it.git (fetch)
+origin	git@gitee.com:hqtang/learn-git.git (push)
+```
+现在可以看到，origin已经被关联到码云的远程库了。通过`git push`命令就可以把本地库推送到Gitee上。
+有的小伙伴又要问了，一个本地库能不能既关联GitHub，又关联码云呢？
+答案是肯定的，因为git本身是分布式版本控制系统，可以同步到另外一个远程库，当然也可以同步到另外两个远程库。
+使用多个远程库时，我们要注意，git给远程库起的默认名称是`origin`，如果有多个远程库，我们需要用不同的名称来标识不同的远程库。
+仍然以`learngit`本地库为例，我们先删除已关联的名为`origin`的远程库：
+```shell
+git remote rm origin
+```
+然后，先关联GitHub的远程库：
+```
+git remote add github git@github.com:hqtang-git/learn_git.git
+```
+注意，远程库的名称叫`github`，不叫`origin`了。
+接着，再关联码云的远程库：
+```shell
+git remote add gitee git@gitee.com:hqtang/learn-git.git
+```
+同样注意，远程库的名称叫`gitee`，不叫`origin`。
+现在，我们用`git remote -v`查看远程库信息，可以看到两个远程库：
+```shell
+git remote -v
+gitee	git@gitee.com:hqtang/learn-git.git (fetch)
+gitee	git@gitee.com:hqtang/learn-git.git (push)
+github	git@github.com:hqtang-git/learn_git.git (fetch)
+github	git@github.com:hqtang-git/learn_git.git (push)
+```
+如果要推送到GitHub，使用命令：
+```shell
+git push github master
+```
+如果要推送到码云，使用命令：
+```shell
+git push gitee master
+```
+这样一来，我们的本地库就可以同时与多个远程库互相同步：
+```ascii
+┌─────────┐ ┌─────────┐
+│ GitHub  │ │  Gitee  │
+└─────────┘ └─────────┘
+     ▲           ▲
+     └─────┬─────┘
+           │
+    ┌─────────────┐
+    │ Local Repo  │
+    └─────────────┘
+```
+码云也同样提供了Pull request功能，可以让其他小伙伴参与到开源项目中来。你可以通过Fork我的仓库：https://gitee.com/hqtang/learn-git，创建一个`your-gitee-id.txt`的文本文件， 写点自己学习Git的心得，然后推送一个pull request给我，这个仓库会在码云和GitHub做双向同步。
